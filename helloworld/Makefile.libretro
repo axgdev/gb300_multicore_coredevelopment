@@ -1,0 +1,35 @@
+TARGET_NAME := helloworld
+
+SOURCES_C := src/helloworld.c
+
+CFLAGS :=
+LDFLAGS :=
+
+TARGET := helloworld.a
+MIPS=/opt/mips32-mti-elf/2019.09-03-2/bin/mips-mti-elf-
+CC = $(MIPS)gcc
+AR = $(MIPS)ar
+CFLAGS += -EL -march=mips32 -mtune=mips32 -msoft-float -G0 -mno-abicalls -fno-pic
+CFLAGS += -ffast-math -fomit-frame-pointer -ffunction-sections -fdata-sections
+CFLAGS += -DSF2000
+STATIC_LINKING = 1
+
+OBJECTS := $(SOURCES_C:.c=.o)
+
+all: $(TARGET)
+
+ifeq ($(STATIC_LINKING), 1)
+$(TARGET): $(OBJECTS)
+	$(AR) rcs $@ $(OBJECTS)
+else
+$(TARGET): $(OBJECTS)
+	$(CC) -o $@ $(OBJECTS) $(LDFLAGS)
+endif
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(TARGET) $(OBJECTS)
+
+.PHONY: clean all
